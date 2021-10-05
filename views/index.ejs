@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" type="text/css" href="/style.css">
+   <title>Document</title>
+</head>
+
+<body>
+
+   <table id="table" border="2" align="center">
+
+      <tr>
+         <th>Name</th>
+         <th>Issuer</th>
+         <th>Apr</th>
+         <th>Fee</th>
+         <th>Travel</th>
+         <th>Dining</th>
+         <th>Other</th>
+      </tr>
+
+
+      <%cardsList.forEach(cards=> {%>
+         <tr id="table-tr">
+            <th>
+               <%= cards.name %>
+            </th>
+            <td>
+               <%= cards.issuer %>
+            </td>
+            <td>
+               <%= cards.apr %>
+            </td>
+            <td>
+               <%= cards.Fee %>
+            </td>
+            <td>
+               <%= cards.travel %>
+            </td>
+            <td>
+               <%= cards.dining %>
+            </td>
+            <td>
+               <%= cards.other %>
+            </td>
+         </tr>
+         <%})%>
+
+   </table>
+
+   <form class="form" action="/form" method="post">
+      <label>Cards name</label>
+      <input type="text" name="name">
+
+      <label>Issuer</label>
+      <input type="text" name="issuer">
+
+      <label>Apr</label>
+      <input type="text" name="apr">
+
+      <label>Fee</label>
+      <input type="text" name="Fee">
+
+      <label>Travel</label>
+      <input type="text" name="travel">
+
+      <label>Dining</label>
+      <input type="text" name="dining">
+
+      <label>Other</label>
+      <input type="text" name="other">
+
+      <input type="submit"></input>
+
+   </form>
+
+
+</body>
+
+</html>
