@@ -10,9 +10,10 @@
 </head>
 
 <body>
+   <div class="search-box" action="/search" method="GET" <input type="text" class="search-txt" placeholder="Поиск">
+   </div>
 
-   <table id="table" border="2" align="center">
-
+   <table id="tableCards" border="2" align="center">
       <tr>
          <th>Name</th>
          <th>Issuer</th>
@@ -23,36 +24,35 @@
          <th>Other</th>
       </tr>
 
-
-      <%cardsList.forEach(cards=> {%>
-         <tr id="table-tr">
+      <% cardsList.forEach(card => { %>
+         <tr>
             <th>
-               <%= cards.name %>
+               <%= card.name %>
             </th>
             <td>
-               <%= cards.issuer %>
+               <%= card.issuer %>
             </td>
             <td>
-               <%= cards.apr %>
+               <%= card.apr %>
             </td>
             <td>
-               <%= cards.Fee %>
+               <%= card.Fee %>
             </td>
             <td>
-               <%= cards.travel %>
+               <%= card.travel %>
             </td>
             <td>
-               <%= cards.dining %>
+               <%= card.dining %>
             </td>
             <td>
-               <%= cards.other %>
+               <%= card.other %>
             </td>
          </tr>
-         <%})%>
+      <% }) %>
 
    </table>
 
-   <form class="form" action="/form" method="post">
+   <form class="form">
       <label>Cards name</label>
       <input type="text" name="name">
 
@@ -78,6 +78,70 @@
 
    </form>
 
+   <script>
+      const fecthData = async (url, method = 'GET', body = undefined) => {
+         const response = await fetch(url, {
+            method,
+            headers: {
+               'Content-Type': 'application/json'
+            },
+            body: body ? JSON.stringify(body) : undefined
+         });
+         return await response.json();
+      }
+
+      const clearTable = () => {
+         const rows = document.querySelectorAll('#tableCards > tbody > tr');
+         rows.forEach((row, index) => {
+            if (index > 0) {
+               row.remove();
+            }
+         })
+      };
+
+      const loadDataTable = (cards) => {
+         const table = document.querySelector('#tableCards');
+         
+         cards.forEach(card => {
+            table.insertAdjacentHTML('beforeend', `
+               <tr>
+                  <th>${card.name}</th>
+                  <td>${card.issuer}</td>
+                  <td>${card.apr}</td>
+                  <td>${card.Fee}</td>
+                  <td>${card.travel}</td>
+                  <td>${card.dining}</td>
+                  <td>${card.other}</td>
+               </tr>
+            `);   
+         });
+      }
+
+      const form = document.querySelector('.form');
+
+      const onSubmit = (event) => {
+         event.preventDefault();
+
+         const newCard = {
+            name: event.target.name.value,
+            issuer: event.target.issuer.value,
+            apr: event.target.apr.value,
+            Fee: event.target.Fee.value,
+            travel: event.target.travel.value,
+            dining: event.target.dining.value,
+            other: event.target.other.value,
+         };
+
+         fecthData('/form', 'POST', newCard).then(cards => {
+            clearTable();
+            loadDataTable(cards);
+            form.reset();
+         })
+      }
+
+      form.addEventListener('submit', (event) => onSubmit(event));
+      
+   </script>
 
 </body>
 
