@@ -10,8 +10,10 @@
 </head>
 
 <body>
-   <div class="search-box" action="/search" method="GET" <input type="text" class="search-txt" placeholder="Поиск">
-   </div>
+   <input type="text" id="search-box" onkeyup="searchData(this)">
+   <section id="searchResoult">
+
+   </section>
 
    <table id="tableCards" border="2" align="center">
       <tr>
@@ -24,7 +26,7 @@
          <th>Other</th>
       </tr>
 
-      <% cardsList.forEach(card => { %>
+      <% cardsList.forEach(card=> { %>
          <tr>
             <th>
                <%= card.name %>
@@ -48,7 +50,7 @@
                <%= card.other %>
             </td>
          </tr>
-      <% }) %>
+         <% }) %>
 
    </table>
 
@@ -79,6 +81,22 @@
    </form>
 
    <script>
+      const debounce = (fn, ms) => {
+         let timeout;
+         return function () {
+            const fnCall = () => { fn.apply(this, arguments) }
+            clearTimeout(timeout);
+            timeout = setTimeout(fnCall, ms)
+         };
+      }
+
+      function onChange(e) {
+         console.log(e.target.value);
+      }
+
+      onChange = debounce(onChange, 5000);
+      document.getElementById('search-box').addEventListener('keyup', onChange);
+
       const fecthData = async (url, method = 'GET', body = undefined) => {
          const response = await fetch(url, {
             method,
@@ -101,11 +119,11 @@
 
       const loadDataTable = (cards) => {
          const table = document.querySelector('#tableCards');
-         
+
          cards.forEach(card => {
             table.insertAdjacentHTML('beforeend', `
                <tr>
-                  <th>${card.name}</th>
+                  <th>${card.name}</td>
                   <td>${card.issuer}</td>
                   <td>${card.apr}</td>
                   <td>${card.Fee}</td>
@@ -113,8 +131,35 @@
                   <td>${card.dining}</td>
                   <td>${card.other}</td>
                </tr>
-            `);   
+            `);
          });
+      }
+
+      const addRowTable = (card) => {
+         const table = document.querySelector('#tableCards');
+         table.insertAdjacentHTML('beforeend', `
+            <tr>
+               <th>${card.name}</td>
+               <td>${card.issuer}</td>
+               <td>${card.apr}</td>
+               <td>${card.Fee}</td>
+               <td>${card.travel}</td>
+               <td>${card.dining}</td>
+               <td>${card.other}</td>
+            </tr>
+         `);
+      }
+
+      const searchData = async (e) => {
+         const { payload } = await fecthData('/getCard', 'POST', { payload: e.value })
+         searchResoult.innerHTML = '';
+         if (payload.length < 1) {
+            searchResoult.innerHTML = '<p>Nothing Found</p>';
+            return;
+         }
+
+         clearTable();
+         loadDataTable(payload);
       }
 
       const form = document.querySelector('.form');
@@ -132,15 +177,17 @@
             other: event.target.other.value,
          };
 
-         fecthData('/form', 'POST', newCard).then(cards => {
-            clearTable();
-            loadDataTable(cards);
-            form.reset();
+         fecthData('/form', 'POST', newCard).then(result => {
+            if (result.success) {
+               addRowTable(newCard);
+               form.reset();
+            } else {
+               console.error(result)
+            }
          })
       }
 
       form.addEventListener('submit', (event) => onSubmit(event));
-      
    </script>
 
 </body>
